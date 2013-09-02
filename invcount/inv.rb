@@ -75,6 +75,10 @@ end
 def inv_sqrtlog(ary,l)
 	n=ary.size
 	m=1<<log2(n+1).ceil
+	m=sqrt(m).to_i
+	if(m<=1)
+		m=1
+	end
 	if(l>m)
 		big=ary.map{|v|v/(1<<(l-m))}
 		sub=Array.new(1<<m).map{|v|[]}
@@ -92,16 +96,19 @@ end
 
 def inv_comp(ary,l)
 	st0=Time.now
-	inv_naive(ary,1<<l)
+	r0=inv_naive(ary,1<<l)
 	en0=Time.now
-	print "naive:"+(en0-st0).to_s+'sec'
+	puts "naive:"+(en0-st0).to_s+'sec'
 	st1=Time.now
-	inv_halving(ary,l)
+	r1=inv_halving(ary,l)
 	en1=Time.now
-	print "halving:"+(en1-st1).to_s+'sec'
+	puts "halving:"+(en1-st1).to_s+'sec'
 	st2=Time.now
-	inv_sqrtlog(ary,l)
+	r2=inv_sqrtlog(ary,l)
 	en2=Time.now
-	print "sqrtlog:"+(en2-st2).to_s+'sec'
+	puts "sqrtlog:"+(en2-st2).to_s+'sec'
+	if(r1!=r2 || r0!=r1)
+		puts "Error"
+	end
 end
 
