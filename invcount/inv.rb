@@ -72,22 +72,27 @@ def inv_halving(ary,l) #l: size[bit] 0<=ary[i]<2^l
 	return sum
 end
 
-def inv_sqrtlog(ary,l)
-	n=ary.size
-	m=1<<log2(n+1).ceil
-	m=sqrt(m).to_i
-	if(m<=1)
-		m=1
+def inv_sqrtlog(ary,l,ss=-1)
+	size=ary.size
+	if(l>size)
+		size=l
 	end
-	if(l>m)
-		big=ary.map{|v|v/(1<<(l-m))}
-		sub=Array.new(1<<m).map{|v|[]}
-		for v in ary
-			sub[v/(1<<(l-m))]=v%(1<<(l-m))
+	if(ss==-1)
+		ss=1<<log2(size+1).ceil
+		ss=sqrt(ss).to_i
+		if(ss<=1)
+			ss=1
 		end
-		res+=inv_halving(big,m)
-		for s in sub
-			res=inv_sqrtlog(s,l-m)
+	end
+	if(l>ss)
+		big=ary.map{|v|v/(1<<(l-ss))}
+		sub=Array.new(1<<ss).map{|v|[]}
+		for v in ary
+			sub[v/(1<<(l-ss))]=v%(1<<(l-ss))
+		end
+		res+=inv_halving(big,ss)
+		for elem in sub
+			res=inv_sqrtlog(elem,l-ss,ss)
 		end
 		return res
 	end
