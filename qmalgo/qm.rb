@@ -1,6 +1,9 @@
 class QM
 	@n=0
 	@stat=[]
+	# n: the number of terms
+	# data: an array of map:
+	# data[i]=0 ->false 1->true 2->don't care
 	def initialize(n,data)
 		if(n>=16)
 			raise Exception
