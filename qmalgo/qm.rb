@@ -30,7 +30,7 @@ class QM
 	def solve()
 		rem=[] #rem=[[v1,m1], [v2,m2],...], v1:bitmask for true, ~v2:bitmask for don't care
 		on_pat=[]
-		mt=[] #å€
+		mt=[] #å€, prime implicant
 		for i in 0...@stat.size()
 			v=@stat[i]
 			if(v==1)
@@ -55,7 +55,6 @@ class QM
 						paired[x]=paired[i]=true
 						new_pair=[rem[x][0]&rem[i][0],mask^rem[x][0]^rem[i][0]]
 						nxtbuf<<new_pair if (nxtbuf.index(new_pair)).nil?
-						puts "nxtbuf="+nxtbuf.inspect #debug
 					end
 				end
 			end
@@ -63,8 +62,21 @@ class QM
 				mt+=[rem[i]] if !paired[i]
 			end
 			puts "mt="+mt.inspect
+			puts "nxtbuf="+nxtbuf.inspect #debug
 			rem=nxtbuf
 		end
+		# on_pat.size() * mt.size()
+		tbl=Array.new(on_pat.size()).map{|v|Array.new(mt.size(),0)}
+		for i in 0...on_pat.size()
+			pat=on_pat[i]
+			for j in 0...mt.size()
+				set=mt[j]
+				if set[0]==(pat&set[1]) # set has an element pat
+					tbl[i][j]=1
+				end
+			end
+		end
+		puts "tbl="+tbl.inspect
 	end
 end
 
