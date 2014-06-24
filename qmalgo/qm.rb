@@ -77,6 +77,33 @@ class QM
 			end
 		end
 		puts "tbl="+tbl.inspect
+		# patrick's algorithm
+		ts = tbl[0].size
+		dp = Array.new(1 << ts)
+		dp.map!{|v| false}
+		dp[0] = true
+		for i in 0...tbl.size
+			newdp = Array.new(1 << ts, false)
+			for j in 0...tbl[i].size
+				if tbl[i][j] == 1
+					for t in 0 ... 1 << ts
+						newdp[t | (1 << j)] |= dp[t]
+					end
+				end
+			end
+			dp = newdp
+		end
+		puts "dp=" + dp.inspect
+		p (0...dp.size).map{|k| [k,dp[k]]}.select {|v| v[1]}
+		minset = -1
+		mask = (1 << ts) - 1
+		for i in 0 ... 1 << ts
+			if dp[i] && (minset == -1 || (bit_count(i, mask) < bit_count(minset, mask)))
+				minset = i
+			end
+		end
+		if minset == -1 then raise "Error: minset == -1" end
+		return (0...ts).select{|v|(minset & (1 << v)) != 0}.map{|v| mt[v]}
 	end
 end
 
