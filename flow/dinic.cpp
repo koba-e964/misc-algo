@@ -10,26 +10,18 @@
 #include <vector>
 #include <queue>
 
-struct edge {
-  int to, cap, rev; // rev is the position of reverse edge in graph[to]
-};
-
-  using namespace std;
 class Dinic {
 private:
-  vector<vector<edge> > graph;
-  vector<int> level;
-  vector<int> iter;
-public:
-  Dinic(int v) : graph(v), level(v, -1), iter(v, 0) {}
-  void add_edge(int from, int to, int cap) {
-    graph[from].push_back((edge) {to, cap, graph[to].size()});
-    graph[to].push_back((edge) {from, 0, graph[from].size() - 1});
-  }
+  struct edge {
+    int to, cap, rev; // rev is the position of reverse edge in graph[to]
+  };
+  std::vector<std::vector<edge> > graph;
+  std::vector<int> level;
+  std::vector<int> iter;
   /* Perform bfs and calculate distance from s */
   void bfs(int s) {
     level.assign(level.size(), -1);
-    queue<int> que;
+    std::queue<int> que;
     level[s] = 0;
     que.push(s);
     while (! que.empty()) {
@@ -52,7 +44,7 @@ public:
     for (int &i = iter[v]; i < graph[v].size(); ++i) {
       edge &e = graph[v][i];
       if (e.cap > 0 && level[v] < level[e.to]) {
-	int newf = f == -1 ? e.cap : min(f, e.cap);
+	int newf = f == -1 ? e.cap : std::min(f, e.cap);
 	int d = dfs(e.to, t, newf);
 	if (d > 0) {
 	  e.cap -= d;
@@ -62,6 +54,13 @@ public:
       }
     }
     return 0;
+  }
+public:
+  /* v is the number of vertices (labeled from 0 .. v-1) */
+  Dinic(int v) : graph(v), level(v, -1), iter(v, 0) {}
+  void add_edge(int from, int to, int cap) {
+    graph[from].push_back((edge) {to, cap, graph[to].size()});
+    graph[to].push_back((edge) {from, 0, graph[from].size() - 1});
   }
   int max_flow(int s, int t) {
     int flow = 0;
@@ -79,16 +78,8 @@ public:
   }
 };
 
-
-#define REP(i,s,n) for(int i=(int)(s);i<(int)(n);i++)
-
-using namespace std;
-typedef long long int ll;
-const double EPS=1e-9;
-
-
-
 int main(void){
+  using namespace std;
   Dinic din(6);
   int edges[8][3] = {
     {0,1,3},
