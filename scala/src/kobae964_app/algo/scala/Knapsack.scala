@@ -1,17 +1,20 @@
 package kobae964_app.algo.scala
 
-import scala.collection.mutable.LinkedList
 import scala.collection.mutable.ListBuffer
 
 
 object Knapsack {
   /**
    * Solver of 0-1 knapsack problem
+   * @param goods pairs of weights and values
+   * @param maxWeight limit of weight of goods in knapsack
+   * @return Indices of goods that are used and total value
    */
-  def apply(goods : Array[(Int, Int)], maxWeight : Int) : (Array[Int], Int) = {
+  def apply(goods : Array[(Int, Int)], maxWeight : Int) : (List[Int], Int) = {
     if (maxWeight < 0) {
       throw new IllegalArgumentException("maxWeight < 0")
     }
+    // Excludes goods that are too heavy or have negative weight
     val appropriateWithIndices = goods.zipWithIndex.filter(x => 0 <= x._1._1 && x._1._1 <= maxWeight)
     val n = appropriateWithIndices.length
     val appropriate = appropriateWithIndices.map(_._1)
@@ -36,9 +39,14 @@ object Knapsack {
     for (i <- n - 1 to 0 by -1) {
       if (dp(i)(cur) != dp(i + 1)(cur)) { // uses goods[i]
         cur -= appropriate(i)._1
-        appropriateWithIndices(i)._2 +=: l
+        appropriateWithIndices(i)._2 +=: l // converts to original index
       }
     }
-    (l.toArray, dp(n).slice(0, maxWeight + 1).reduce(_ max _))
+    (l.toList, ans(maxi))
+  }
+  def main(args : Array[String]) {
+    println(Knapsack(Array((2,3), (1,2), (3,4), (2,2)), 5) + " == (List(0, 2),7)")
+    println(Knapsack(Array((1,2),(3,1),(1000,4)), 4) + " == (List(0, 1),3)")
+    println(Knapsack(Array((10000,1999),(1,2),(3,1),(1000,4)), 4) + " == (List(1, 2),3)")
   }
 }
