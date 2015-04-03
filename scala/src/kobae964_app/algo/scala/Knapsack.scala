@@ -19,11 +19,13 @@ object Knapsack {
     val n = appropriateWithIndices.length
     val appropriate = appropriateWithIndices.map(_._1)
     val totalW = appropriate.map(_._1).reduce(_ + _)
+    // dp(i)(j) holds the max{ sum of values in S | S is a subset of [0..i] && sum of weights in S <= j }.
+    // In particular, dp(0)(j) = 0 for all j.
     val dp = Array.ofDim[Int](n + 1, totalW + 1)
     for (i <- 0 until n) {
+      val weight = appropriate(i)._1
+      val value = appropriate(i)._2
       for (j <- 0 to totalW) {
-        val weight = appropriate(i)._1
-        val value = appropriate(i)._2
         if (j < weight) {
           dp(i + 1)(j) = dp(i)(j)
         } else {
@@ -32,14 +34,14 @@ object Knapsack {
       }
     }
     // backtrace
-    var l = new ListBuffer[Int]
+    val l = new ListBuffer[Int]
     val ans = dp(n).slice(0, maxWeight + 1)
-    val maxi = ans.zipWithIndex.maxBy(_._1)._2
+    val maxi = ans.zipWithIndex.maxBy(_._1)._2 // the index of maximum elements in ans
     var cur = maxi
-    for (i <- n - 1 to 0 by -1) {
-      if (dp(i)(cur) != dp(i + 1)(cur)) { // uses goods[i]
+    for (i <- n - 1 to 0 by -1) { // loop invariant: forall i. the total weight of goods in optimal set `union` [0..i] is cur
+      if (dp(i)(cur) != dp(i + 1)(cur)) { // uses appropriate(i)
         cur -= appropriate(i)._1
-        appropriateWithIndices(i)._2 +=: l // converts to original index
+        appropriateWithIndices(i)._2 +=: l // converts i to the original index
       }
     }
     (l.toList, ans(maxi))
