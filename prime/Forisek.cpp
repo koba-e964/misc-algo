@@ -67,6 +67,15 @@ bool is_prime(uint32_t x) {
 
 bool is_prime_2(uint32_t x) {
   uint32_t bases[] = {2, 7, 61};
+  if (x==2 || x==3 || x==5 || x==7) {
+    return true;
+  }
+  if (x%2==0 || x%3==0 || x%5==0 || x%7==0) {
+    return false;
+  }
+  if (x < 121) {
+    return x > 1;
+  }
   for (uint32_t i = 0; i < sizeof(bases) / sizeof(bases[0]); ++i) {
     if (x != bases[i] && ! is_SPRP(x, bases[i])) {
       return false;
@@ -82,32 +91,26 @@ int main(int argc, char *argv[]) {
   if (argc == 1) {
     for (uint32_t i = 1; i < MAX; ++i) {
       uint32_t x = 2 * i + 1;
-      if (is_prime(x) != is_prime_2(x)) {
+      bool k1 = is_prime(x);
+      bool k2 = is_prime_2(x);
+      if (k1 != k2) {
         cout << "error:" << x << endl;
         return 1;
       }
-      if (i % 5000000 == 0) {
-        cout << "test complete until " << x << endl;
-      }
+      pc += k1;
     }
   }
   if (argc == 2) {
-    if (strcmp(argv[1], "1") == 0) {
+    if (strcmp(argv[1], "1") == 0) { // use faster version
       for (uint32_t i = 1; i < MAX; ++i) {
         uint32_t x = 2 * i + 1;
         pc += is_prime(x);
-        if (i % 5000000 == 0) {
-          cout << "test complete until " << x << endl;
-        }
       }
     }
-    if (strcmp(argv[1], "2") == 0) {
+    if (strcmp(argv[1], "2") == 0) { // use slower version
       for (uint32_t i = 1; i < MAX; ++i) {
         uint32_t x = 2 * i + 1;
         pc += is_prime_2(x);
-        if (i % 5000000 == 0) {
-          cout << "test complete until " << x << endl;
-        }
       }
     }
   }
