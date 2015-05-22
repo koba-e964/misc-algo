@@ -20,12 +20,13 @@ istream &operator>>(istream &is, TreeDecomp &td) {
   td.wei = 0;
   td.parent.resize(n,-1);
   td.children.resize(n, vector<int>());
+  td.bags.resize(n, vector<int>());
   for (int i = 0; i < n; ++i) {
     cin >> td.parent[i];// parent[0] must be -1.
     int m;
     cin >> m;
     td.wei = max(td.wei, m);
-    vector<int> &ch = td.children[i];
+    vector<int> &ch = td.bags[i];
     ch.resize(m, -1);
     for (int j = 0; j < m; ++j) {
       cin >> ch[j];
@@ -38,7 +39,7 @@ ostream &operator<<(ostream &os, const TreeDecomp &td) {
   cout << "*** Tree Decomposition ***" << endl;
   for (int i = 0; i < td.parent.size(); ++i) {
     cout << "parent[" << i << "] = " << td.parent[i] << endl;
-    const vector<int> &ch = td.children[i];
+    const vector<int> &ch = td.bags[i];
     cout << "bags[" << i << "]:";
     for (int j = 0; j < ch.size(); ++j) {
       cout << ch[j] << " ";
@@ -48,10 +49,3 @@ ostream &operator<<(ostream &os, const TreeDecomp &td) {
   return os;
 }
 
-
-int main(void) {
-  TreeDecomp td;
-  cin >> td;
-  cout << td << endl;
-  cout << "width = " << td.width() << endl;
-}
