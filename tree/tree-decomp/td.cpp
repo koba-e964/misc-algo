@@ -8,6 +8,9 @@ struct TreeDecomp {
   vector<vector<int> > children;
   vector<vector<int> > bags;
   int wei;
+  int size() const {
+    return parent.size();
+  }
   int width() const {
     return wei - 1;
   }
@@ -23,6 +26,7 @@ istream &operator>>(istream &is, TreeDecomp &td) {
   td.bags.resize(n, vector<int>());
   for (int i = 0; i < n; ++i) {
     cin >> td.parent[i];// parent[0] must be -1.
+    td.children[td.parent[i]].push_back(i);
     int m;
     cin >> m;
     td.wei = max(td.wei, m);
@@ -39,10 +43,16 @@ ostream &operator<<(ostream &os, const TreeDecomp &td) {
   cout << "*** Tree Decomposition ***" << endl;
   for (int i = 0; i < td.parent.size(); ++i) {
     cout << "parent[" << i << "] = " << td.parent[i] << endl;
-    const vector<int> &ch = td.bags[i];
-    cout << "bags[" << i << "]:";
+    const vector<int> &ch = td.children[i];
+    cout << "children[" << i << "]:";
     for (int j = 0; j < ch.size(); ++j) {
       cout << ch[j] << " ";
+    }
+    cout << endl;
+    const vector<int> &bag = td.bags[i];
+    cout << "bags[" << i << "]:";
+    for (int j = 0; j < bag.size(); ++j) {
+      cout << bag[j] << " ";
     }
     cout << endl;
   }
