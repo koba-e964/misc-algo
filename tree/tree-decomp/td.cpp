@@ -26,7 +26,9 @@ istream &operator>>(istream &is, TreeDecomp &td) {
   td.bags.resize(n, vector<int>());
   for (int i = 0; i < n; ++i) {
     cin >> td.parent[i];// parent[0] must be -1.
-    td.children[td.parent[i]].push_back(i);
+    if (td.parent[i] >= 0) {
+      td.children[td.parent[i]].push_back(i);
+    }
     int m;
     cin >> m;
     td.wei = max(td.wei, m);

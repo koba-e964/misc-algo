@@ -7,6 +7,7 @@ struct Graph {
 
 const int MAX_WIDTH = 8;
 const int MEMO = 1 << (MAX_WIDTH + 1);
+const int minf = -123456789;
 
 // for nice tree decomposition
 void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
@@ -24,12 +25,48 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
   if (s == 1) { // introduce, forget
     int b = bag.size();
     int ch = td.children[r][0];
+    const vector<int> &chb = td.bags[ch];
     if (b - td.bags[ch].size() == 1) { // introduce
       cout << "intro: " << r << " <- " << ch << endl;
+      int v, vpos;
+      vector<int> map(chb.size() + 1); // map from bag to chb
+      for (int i = 0; i < b; ++i) {
+	vector<int>::const_iterator it = find(chb.begin(), chb.end(), bag[i]);
+	if (it == chb.end()) {
+	  v = bag[i];
+	  vpos = i;
+       	}
+        map[i] = it - chb.begin();
+      }
+      const vector<int> &adj = g.adj[v];
+      int adjbits = 0;
+      for (int i = 0; i < b; i++) {
+	if (adj[bag[i]]) {
+	  adjbits |= 1 << i;
+	}
+      }
+      for (int bits = 0; bits < (1 << b); ++bits) {
+	int sum = 0;
+	if (bits & (1 << vpos)) {
+	  if (bits & adjbits) {
+	    dp[r][bits] = minf;
+	    continue;
+	  }
+	  sum += g.weight[v];
+	}
+	int chbits = 0;
+	for (int i = 0; i < b; ++i) {
+	  if ((bits & (1 << i)) == 0) { continue; }
+	  if (map[i] == b - 1) { continue; }
+	  chbits |= 1 << map[i];
+	}
+	dp[r][bits] = dp[ch][chbits] + sum;
+      }
       return;
     }
     if (b - td.bags[ch].size() == -1) { // forget
       cout << "forget: " << r << " <- " << ch << endl;
+      
       return;
     }
     
@@ -43,7 +80,14 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
     int ch1 = td.children[r][0];
     int ch2 = td.children[r][1];
     for (int bits = 0; bits < (1 << b); ++bits) {
-      dp[r][bits] = max(dp[ch1][bits], dp[ch2][bits]);
+      dp[r][bits] = dp[ch1][bits] + dp[ch2][bits];
+      for (int i = 0; i < b; i++) {
+	if ((bits & (1 << i)) == 0) {
+	  continue;
+	}
+	int t = bag[i];
+	dp[r][bits] -= g.weight[t];
+      }
     }
   }
 }
