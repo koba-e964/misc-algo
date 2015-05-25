@@ -23,14 +23,13 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
     rec(td, g, td.children[r][i], dp);
   }
   if (s == 1) { // introduce, forget
-    int b = bag.size();
+    size_t b = bag.size();
     int ch = td.children[r][0];
     const vector<int> &chb = td.bags[ch];
-    if (b - td.bags[ch].size() == 1) { // introduce
-      cout << "intro: " << r << " <- " << ch << endl;
-      int v, vpos;
-      vector<int> map(chb.size() + 1); // map from bag to chb
-      for (int i = 0; i < b; ++i) {
+    if (b == chb.size() + 1) { // introduce
+      size_t v, vpos; // v : the index of introduced vertex, bag[vpos] ==  v
+      vector<size_t> map(b); // map from bag to chb. bag[i] = chb[map[i]]
+      for (size_t i = 0; i < b; ++i) {
 	vector<int>::const_iterator it = find(chb.begin(), chb.end(), bag[i]);
 	if (it == chb.end()) {
 	  v = bag[i];
@@ -39,8 +38,8 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
         map[i] = it - chb.begin();
       }
       const vector<int> &adj = g.adj[v];
-      int adjbits = 0;
-      for (int i = 0; i < b; i++) {
+      int adjbits = 0; // S /\ B_ch in B_ch
+      for (size_t i = 0; i < b; i++) {
 	if (adj[bag[i]]) {
 	  adjbits |= 1 << i;
 	}
@@ -55,7 +54,7 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
 	  sum += g.weight[v];
 	}
 	int chbits = 0;
-	for (int i = 0; i < b; ++i) {
+	for (size_t i = 0; i < b; ++i) {
 	  if ((bits & (1 << i)) == 0) { continue; }
 	  if (map[i] == b - 1) { continue; }
 	  chbits |= 1 << map[i];
@@ -64,24 +63,35 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
       }
       return;
     }
-    if (b - td.bags[ch].size() == -1) { // forget
+    if (b == chb.size() - 1) { // forget
       cout << "forget: " << r << " <- " << ch << endl;
-      
+      int v; // v : 1 << the index of forgotten vertex
+      vector<int> map(b); // map from bag to chb. bag[i] = chb[map[i]]
+      v = (1 << (b + 1)) - 1;
+      for (size_t i = 0; i < b; ++i) {
+	int t = find(chb.begin(), chb.end(), bag[i]) - chb.begin();
+	map[i] = t;
+	v ^= 1 << t;
+      }
+      assert (v != 0 && (v & (-v)) == v); // one bit is activated
+      for (int bits = 0; bits < (1 << b); ++bits) {
+	int chbits = 0;
+	for (size_t i = 0; i < b; ++i) {
+	  if ((bits & (1 << i)) == 0) { continue; }
+	  chbits |= 1 << map[i];
+	}
+	dp[r][bits] = max(dp[ch][chbits], dp[ch][chbits | v]);
+      }
       return;
     }
-    
-    for (int bits = 0; bits < (1 << b); ++bits) {
-      dp[r][bits] = 0; // TODO;
-    }
-    return;
   }
   if (s == 2) { // join
-    int b = bag.size();
+    size_t b = bag.size();
     int ch1 = td.children[r][0];
     int ch2 = td.children[r][1];
     for (int bits = 0; bits < (1 << b); ++bits) {
       dp[r][bits] = dp[ch1][bits] + dp[ch2][bits];
-      for (int i = 0; i < b; i++) {
+      for (size_t i = 0; i < b; i++) {
 	if ((bits & (1 << i)) == 0) {
 	  continue;
 	}
