@@ -64,7 +64,6 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
       return;
     }
     if (b == chb.size() - 1) { // forget
-      cout << "forget: " << r << " <- " << ch << endl;
       int v; // v : 1 << the index of forgotten vertex
       vector<int> map(b); // map from bag to chb. bag[i] = chb[map[i]]
       v = (1 << (b + 1)) - 1;
@@ -89,6 +88,7 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
     size_t b = bag.size();
     int ch1 = td.children[r][0];
     int ch2 = td.children[r][1];
+    assert (bag == td.bags[ch1] && bag == td.bags[ch2]);
     for (int bits = 0; bits < (1 << b); ++bits) {
       dp[r][bits] = dp[ch1][bits] + dp[ch2][bits];
       for (size_t i = 0; i < b; i++) {
@@ -99,7 +99,9 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
 	dp[r][bits] -= g.weight[t];
       }
     }
+    return;
   }
+  assert (! "It is not a nice tree decomposition. |Children| >= 3.");
 }
 
 int max_indep(const TreeDecomp &td, const Graph &g) {
