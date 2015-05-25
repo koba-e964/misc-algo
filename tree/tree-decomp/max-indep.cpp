@@ -16,7 +16,7 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
   if (s == 0) { // Leaf
     assert(bag.size() == 1);
     dp[r][0] = 0;
-    dp[r][1] = g.weight[r];
+    dp[r][1] = g.weight[bag[0]];
     return;
   }
   for (int i = 0; i < s; ++i) {
@@ -60,6 +60,9 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
 	  chbits |= 1 << map[i];
 	}
 	dp[r][bits] = dp[ch][chbits] + sum;
+	if (dp[r][bits]  <= minf) {
+	  dp[r][bits] = minf;
+	}
       }
       return;
     }
@@ -98,6 +101,9 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
 	int t = bag[i];
 	dp[r][bits] -= g.weight[t];
       }
+      if (dp[r][bits] <= minf) {
+	dp[r][bits] = minf;
+      }
     }
     return;
   }
@@ -112,6 +118,11 @@ int max_indep(const TreeDecomp &td, const Graph &g) {
   int (*dp)[MEMO] = new int[n][MEMO];
   rec(td, g, 0, dp);
   int ma = 0;
+  for (int r = 0; r < n; ++r) {
+    for (int bits = 0; bits < (1 << td.bags[r].size()); ++bits) {
+      cout << "dp[" << r << "][" << bits << "] = " << dp[r][bits] << endl;
+    }
+  }
   for (int bits = 0; bits < (1 << td.bags[0].size()); ++bits) {
     ma = max(ma, dp[0][bits]);
   }
