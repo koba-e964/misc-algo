@@ -1,4 +1,7 @@
-#include "./td.cpp"
+#include <bits/stdc++.h>
+#include "./td.h"
+
+using namespace std;
 
 struct Graph {
   vector<vector<int> > adj; // n * n matrix

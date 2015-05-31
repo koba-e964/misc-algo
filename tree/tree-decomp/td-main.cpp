@@ -1,5 +1,8 @@
-#include "./td.cpp"
+#include <iostream>
+#include "./td.h"
 
+
+using namespace std;
 int main(void) {
   TreeDecomp td;
   cin >> td;

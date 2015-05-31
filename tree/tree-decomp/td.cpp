@@ -1,21 +1,7 @@
 #include <bits/stdc++.h>
-
+#include "./td.h"
 
 using namespace std;
-
-struct TreeDecomp {
-  vector<int> parent;
-  vector<vector<int> > children;
-  vector<vector<int> > bags;
-  int wei;
-  int size() const {
-    return parent.size();
-  }
-  int width() const {
-    return wei - 1;
-  }
-};
-
 
 istream &operator>>(istream &is, TreeDecomp &td) {
   int n;
