@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -Wpedantic
+CXXFLAGS = -Wall -Wextra -Wpedantic
 OBJS = td-main max-indep decomp-main
 
 .PHONY : clean

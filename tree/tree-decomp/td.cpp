@@ -30,17 +30,17 @@ istream &operator>>(istream &is, TreeDecomp &td) {
 
 ostream &operator<<(ostream &os, const TreeDecomp &td) {
   cout << "*** Tree Decomposition ***" << endl;
-  for (int i = 0; i < td.parent.size(); ++i) {
+  for (int i = 0; i < (int)td.parent.size(); ++i) {
     cout << "parent[" << i << "] = " << td.parent[i] << endl;
     const vector<int> &ch = td.children[i];
     cout << "children[" << i << "]:";
-    for (int j = 0; j < ch.size(); ++j) {
+    for (int j = 0; j < (int)ch.size(); ++j) {
       cout << ch[j] << " ";
     }
     cout << endl;
     const vector<int> &bag = td.bags[i];
     cout << "bags[" << i << "]:";
-    for (int j = 0; j < bag.size(); ++j) {
+    for (int j = 0; j < (int)bag.size(); ++j) {
       cout << bag[j] << " ";
     }
     cout << endl;
