@@ -1,5 +1,6 @@
-#include <bits/stdc++.h>
 #include "./td.h"
+#include <vector>
+#include <iostream>
 
 using namespace std;
 
