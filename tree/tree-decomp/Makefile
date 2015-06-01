@@ -1,5 +1,5 @@
 CXXFLAGS = -Wall -Wextra -Wpedantic
-OBJS = td-main max-indep-main decomp-main decomp-max-indep
+OBJS = td-main max-indep-main decomp-main decomp-max-indep max-indep-exp
 
 .PHONY : clean
 
@@ -11,5 +11,10 @@ decomp-main: td.cpp td.h decomp.cpp decomp.h decomp-main.cpp
 	$(CXX) $(CXXFLAGS) td.cpp decomp.cpp decomp-main.cpp -o $@
 decomp-max-indep: td.cpp td.h decomp.cpp decomp.h max-indep.cpp max-indep.h decomp-max-indep.cpp
 	$(CXX) $(CXXFLAGS) td.cpp decomp.cpp max-indep.cpp decomp-max-indep.cpp -o $@
+max-indep-exp : max-indep-exp.cpp
+	$(CXX) $(CXXFLAGS) max-indep-exp.cpp -o $@
+indep/%.test : max-indep-exp decomp-max-indep indep/%.txt
+	./max-indep-exp <indep/$*.txt
+	./decomp-max-indep <indep/$*.txt
 clean :
 	$(RM) $(OBJS)

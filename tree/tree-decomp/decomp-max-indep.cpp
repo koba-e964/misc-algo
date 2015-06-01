@@ -20,7 +20,6 @@ int main(void) {
   }
   TreeDecomp td = path_decomp(graph);
   TreeDecomp nice = make_nice_decomp(td);
-  cout << nice << endl;
   Graph g;
   /* convert to matrix representation */
   g.adj.resize(n, vector<int>());
@@ -36,8 +35,8 @@ int main(void) {
     }
   }
   g.weight.resize(n);
-  for (int i = 0; i < n; ++i) { // All vertices have the same weight 1.
-    g.weight[i] = 1;
+  for (int i = 0; i < n; ++i) {
+    cin >> g.weight[i];
   }
   cout << "max-indep = " << max_indep(nice, g) << endl;
 }
