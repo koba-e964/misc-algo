@@ -1,25 +1,25 @@
-#include <bits/stdc++.h>
 #include "./td.h"
+#include "./max-indep.h"
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
-struct Graph {
-  vector<vector<int> > adj; // n * n matrix
-  vector<int> weight; // weights of vertices
-};
 
 const int MAX_WIDTH = 8;
 const int MEMO = 1 << (MAX_WIDTH + 1);
 const int minf = -123456789;
+const bool DEBUG = false;
 
 // for nice tree decomposition
 void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
   int s = td.children[r].size();
   const vector<int> &bag = td.bags[r];
   if (s == 0) { // Leaf
-    assert(bag.size() == 1);
+    assert(bag.size() == 0);
     dp[r][0] = 0;
-    dp[r][1] = g.weight[bag[0]];
     return;
   }
   for (int i = 0; i < s; ++i) {
@@ -121,9 +121,16 @@ int max_indep(const TreeDecomp &td, const Graph &g) {
   int (*dp)[MEMO] = new int[n][MEMO];
   rec(td, g, 0, dp);
   int ma = 0;
-  for (int r = 0; r < n; ++r) {
-    for (int bits = 0; bits < (1 << td.bags[r].size()); ++bits) {
-      cout << "dp[" << r << "][" << bits << "] = " << dp[r][bits] << endl;
+  if (DEBUG) {
+    for (int r = 0; r < n; ++r) {
+      for (int bits = 0; bits < (1 << td.bags[r].size()); ++bits) {
+	cout << "dp[" << r << "][" << bits << "] = ";
+	if (dp[r][bits] == minf) {
+	  cout << "- inf"  << endl;
+	} else {
+	  cout << dp[r][bits] << endl;
+	}
+      }
     }
   }
   for (int bits = 0; bits < (1 << td.bags[0].size()); ++bits) {
@@ -132,30 +139,3 @@ int max_indep(const TreeDecomp &td, const Graph &g) {
   return ma;
 }
 
-int main(void) {
-  int n;
-  TreeDecomp td;
-  cin >> td;
-  cout << td;
-  cin >> n; // |V(G)|
-  Graph g;
-  g.adj.resize(n, vector<int>());
-  for (int i = 0; i < n; ++i) {
-    g.adj[i].resize(n, 0);
-  }
-  for (int i = 0; i < n; ++i) { // read a graph
-    int m;
-    cin >> m;
-    for (int j = 0; j < m; ++j) {
-      int t;
-      cin >> t;
-      g.adj[i][t] = 1;
-      g.adj[t][i] = 1;
-    }
-  }
-  g.weight.resize(n);
-  for (int i = 0; i < n; ++i) { // read weights of vertices
-    cin >> g.weight[i];
-  }
-  cout << "max-indep = " << max_indep(td, g) << endl;
-}
