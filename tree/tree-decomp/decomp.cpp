@@ -23,6 +23,7 @@ TreeDecomp path_decomp(const vector<vector<int> > & graph) {
     td.children[i].push_back(i + 1);
   }
   td.bags.resize(n);
+  int w = 0;
   for (int i = 0; i < n; ++i) {
     vector<int> bag;
     bag.push_back(i);
@@ -36,7 +37,9 @@ TreeDecomp path_decomp(const vector<vector<int> > & graph) {
       }
     }
     td.bags[i] = bag;
+    w = max(w, (int)bag.size());
   }
+  td.wei = w;
   return td;
      
 }
@@ -124,6 +127,11 @@ void make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r) {
 TreeDecomp make_nice_decomp(const TreeDecomp & td) {
   TreeDecomp dest;
   make_nice_decomp_rec(td, dest, 0);
+  int w = 0;
+  for (int i = 0; i < dest.size(); ++i) {
+    w = max(w, (int)dest.bags[i].size());
+  }
+  dest.wei = w;
   return dest;
 }
 

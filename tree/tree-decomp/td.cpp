@@ -44,6 +44,7 @@ ostream &operator<<(ostream &os, const TreeDecomp &td) {
     }
     cout << endl;
   }
+  cout << "tree-width = " << td.width() << endl;
   return os;
 }
 
