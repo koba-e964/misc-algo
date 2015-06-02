@@ -48,8 +48,9 @@ TreeDecomp path_decomp(const vector<vector<int> > & graph) {
 
 /*
  * Assumes that bags are already sorted.
+ * Returns the index of vertex r in dest.
  */
-void make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r) {
+int make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r, int parent) {
   // since we handle with path decompositions only, each vertex has at most one child.
   int rd = dest.size();
   int nc = td.children[r].size();
@@ -62,18 +63,20 @@ void make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r) {
     dest.children.resize(rd + bs + 1);
     dest.bags.resize(rd + bs + 1);
     for (int i = 0; i <= bs; ++i) {
-      dest.parent[rd + i] = rd + i - 1; // assume that this decomposition is a path-decomp. in general situation, we have to calc the parent.
+      dest.parent[rd + i] = i == 0 ? parent : rd + i - 1; // assume that this decomposition is a path-decomp. in general situation, we have to calc the parent.
       if (i < bs) {
 	dest.children[rd + i].push_back(rd + i + 1);
       }
       dest.bags[rd + i] = bag;
       bag.pop_back(); // introduce
     }
-    return;
+    return rd;
   }
-  if (nc == 1) { // one child.
+  int cur_root = rd;
+  int cur_par = parent;
+  for (int chid = 0; chid < nc; ++chid) {
     vector<int> pb = td.bags[r]; // mutable
-    int child = td.children[r][0];
+    int child = td.children[r][chid];
     const vector<int> cb = td.bags[child];
     vector<vector<int> > dbags;
     dbags.push_back(pb); // top
@@ -107,27 +110,32 @@ void make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r) {
       dbags.push_back(pb);
     }
     int ds = dbags.size();
-    // nodes rb .. rb + ds - 1 are used.
-    dest.parent.resize(rd + ds - 1);
-    dest.children.resize(rd + ds - 1);
-    dest.bags.resize(rd + ds - 1);
+    // nodes cur_root .. cur_root + ds - 1 are used.
+    int end = cur_root + ds - 1;
+    dest.parent.resize(end);
+    dest.children.resize(end);
+    dest.bags.resize(end);
     for (int i = 0; i < ds; ++i) {
       if (i < ds - 1) { // if i == ds - 1, creation of node rd + i will be done by subroutine.
-	dest.parent[rd + i] = rd + i - 1; // assume that this decomposition is a path-decomp. in general situation, we have to calc the parent.
-	dest.children[rd + i].push_back(rd + i + 1);
-	dest.bags[rd + i] = dbags[i];
+	dest.parent[cur_root + i] = i == 0 ? cur_par : cur_root + i - 1; // assume that this decomposition is a path-decomp. in general situation, we have to calc the parent.
+	dest.children[cur_root + i].push_back(cur_root + i + 1);
+	dest.bags[cur_root + i] = dbags[i];
       }
     }
-    make_nice_decomp_rec(td, dest, child);
-    return;
-    
+    int child_dest = make_nice_decomp_rec(td, dest, child, cur_root + ds - 2);
+    dest.children[end - 1][dest.children[end - 1].size() - 1] = child_dest;
+    if (chid < nc - 1) {
+      cur_par = cur_root;
+      cur_root = dest.size();
+      dest.children[cur_par].push_back(cur_root);
+    }
   }
-  assert (!"not a path-decomposition. detected branch");
+  return rd;
 }
 
 TreeDecomp make_nice_decomp(const TreeDecomp & td) {
   TreeDecomp dest;
-  make_nice_decomp_rec(td, dest, 0);
+  make_nice_decomp_rec(td, dest, 0, -1);
   int w = 0;
   for (int i = 0; i < dest.size(); ++i) {
     w = max(w, (int)dest.bags[i].size());

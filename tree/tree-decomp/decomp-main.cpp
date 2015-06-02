@@ -16,9 +16,13 @@ int main(void) {
     }
     graph.push_back(adj);
   }
-  TreeDecomp td = path_decomp(graph);
-  cout << td << endl;
-  TreeDecomp nice = make_nice_decomp(td);
+  TreeDecomp pd = path_decomp(graph);
+  cout << pd << endl;
+  TreeDecomp nice = make_nice_decomp(pd);
   cout << nice << endl;
-  cout << greedy_degree(graph) << endl;
+  TreeDecomp td = greedy_degree(graph);
+  cout << td << endl;
+  TreeDecomp nicetd = make_nice_decomp(td);
+  cout << nicetd << endl;
+  
 }
