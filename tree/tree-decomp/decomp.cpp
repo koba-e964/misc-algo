@@ -135,3 +135,87 @@ TreeDecomp make_nice_decomp(const TreeDecomp & td) {
   dest.wei = w;
   return dest;
 }
+
+
+
+TreeDecomp greedy_degree(const vector<vector<int> > &graph) {
+  int n = graph.size(); // |V|
+  vector<vector<bool> > copy(n); // matrix
+  for(int i = 0; i < n; ++i) {
+    copy[i].resize(n);
+    for (int j = 0; j < (int)graph[i].size(); ++j) {
+      copy[i][graph[i][j]] = true;
+    }
+  }
+  vector<bool> used(n);
+  vector<int> degree(n);
+  for (int i = 0; i < n; ++i) {
+    degree[i] = graph[i].size();
+  }
+  vector<int> elim(n, -1);
+  vector<vector<int> > bag(n, vector<int>());
+  for (int trial = 0; trial < n; trial++) {
+    int mi = -1;
+    for (int j = 0; j < n; j++) {
+      if (used[j]) {
+	continue;
+      }
+      if (mi == -1 || degree[mi] > degree[j]) {
+	mi = j;
+      }
+    }
+    elim[trial] = mi;
+    vector<int> cb;
+    cb.push_back(mi);
+    for (int i = 0; i < n; ++i) {
+      if (copy[mi][i] && ! used[i]) {
+	cb.push_back(i);
+      }
+    }
+    sort(cb.begin(), cb.end());
+    bag[trial] = cb;
+    for (int i = 0; i < (int)cb.size(); ++i) { // make N_G(mi) clique
+      for (int j = 0; j < (int)cb.size(); ++j) {
+	if (i == j) {
+	  continue;
+	}
+	degree[cb[i]] += ! copy[cb[i]][cb[j]];
+	copy[cb[i]][cb[j]] = true;
+      }
+    }
+    for (int i = 0; i < n; ++i) { // remove vertex (mi)
+      degree[mi] -= copy[mi][i];
+      degree[i] -= copy[i][mi];
+      copy[mi][i] = false;
+      copy[i][mi] = false;
+    }
+    used[mi] = true;
+  }
+  TreeDecomp td;
+  td.parent.resize(n);
+  td.children.resize(n);
+  td.bags.resize(n);
+  for (int i = n - 1; i >= 0; --i) { // handle with elim[i].
+    int tv = n - 1 - i;
+    int par;
+    if (tv == 0) {
+      par = -1;
+    } else {
+      for (int j = i + 1; j < n; ++j) {
+	if (count(bag[i].begin(), bag[i].end(), elim[j])) {
+	  par = n - 1 - j;
+	  break;
+	}
+      }
+    }
+    td.parent[tv] = par;
+    td.children[par].push_back(tv);
+    td.bags[tv] = bag[i];
+  }
+  int w = 0;
+  for (int i = 0; i < td.size(); ++i) {
+    w = max(w, (int)td.bags[i].size());
+  }
+  td.wei = w;
+  return td;
+}

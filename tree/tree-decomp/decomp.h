@@ -14,4 +14,6 @@ void make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r);
 
 TreeDecomp make_nice_decomp(const TreeDecomp & td);
 
+TreeDecomp greedy_degree(const std::vector<std::vector<int> > & graph);
+
 #endif // #ifndef DECOMP_H_

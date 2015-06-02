@@ -20,4 +20,5 @@ int main(void) {
   cout << td << endl;
   TreeDecomp nice = make_nice_decomp(td);
   cout << nice << endl;
+  cout << greedy_degree(graph) << endl;
 }
