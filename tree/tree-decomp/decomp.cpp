@@ -80,6 +80,9 @@ int make_nice_decomp_rec(const TreeDecomp &td, TreeDecomp &dest, int r, int pare
     const vector<int> cb = td.bags[child];
     vector<vector<int> > dbags;
     dbags.push_back(pb); // top
+    if (chid < nc - 1) { // join
+      dbags.push_back(pb);
+    }
     while (1) { // until pb <= cb
       bool cont = true;
       int r = -1; // dummy

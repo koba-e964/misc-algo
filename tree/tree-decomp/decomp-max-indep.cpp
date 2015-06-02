@@ -18,8 +18,10 @@ int main(void) {
     }
     graph.push_back(adj);
   }
-  TreeDecomp td = path_decomp(graph);
-  TreeDecomp nice = make_nice_decomp(td);
+  TreeDecomp pd = path_decomp(graph);
+  TreeDecomp nice = make_nice_decomp(pd);
+  TreeDecomp td = greedy_degree(graph);
+  TreeDecomp nicetd = make_nice_decomp(td);
   Graph g;
   /* convert to matrix representation */
   g.adj.resize(n, vector<int>());
@@ -38,5 +40,11 @@ int main(void) {
   for (int i = 0; i < n; ++i) {
     cin >> g.weight[i];
   }
-  cout << "max-indep = " << max_indep(nice, g) << endl;
+  int mipd = max_indep(nice, g);
+  int mitd = max_indep(nicetd, g);
+  cout << "max-indep(pd) = " << mipd << endl;
+  cout << "max-indep(td) = " << mitd << endl;
+  if (mipd != mitd) {
+    cerr << "***** mipd != mitd *****" << endl;
+  }
 }
