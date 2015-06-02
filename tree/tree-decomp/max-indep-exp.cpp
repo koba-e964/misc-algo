@@ -22,7 +22,7 @@ int main(void) {
     cin >> weight[i];
   }
   // naive O(2^n * n)-time algorithm
-  if (n > 20) {
+  if (n > 30) {
     cerr << "n is too large:" << n << endl;
     return 1;
   }

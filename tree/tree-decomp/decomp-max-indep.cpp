@@ -18,8 +18,6 @@ int main(void) {
     }
     graph.push_back(adj);
   }
-  TreeDecomp pd = path_decomp(graph);
-  TreeDecomp nice = make_nice_decomp(pd);
   TreeDecomp td = greedy_degree(graph);
   TreeDecomp nicetd = make_nice_decomp(td);
   Graph g;
@@ -40,11 +38,6 @@ int main(void) {
   for (int i = 0; i < n; ++i) {
     cin >> g.weight[i];
   }
-  int mipd = max_indep(nice, g);
   int mitd = max_indep(nicetd, g);
-  cout << "max-indep(pd) = " << mipd << endl;
-  cout << "max-indep(td) = " << mitd << endl;
-  if (mipd != mitd) {
-    cerr << "***** mipd != mitd *****" << endl;
-  }
+  cout << "max-indep(td) = " << mitd << " (tree-width = " << nicetd.width() << ")" << endl;
 }

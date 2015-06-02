@@ -6,6 +6,7 @@
 #include <algorithm>
 
 using namespace std;
+const int DEBUG = 0;
 
 /* Makes a path-decomposition of the given (undirected) graph.
  * The graph is given in adjacent list,
@@ -185,6 +186,13 @@ TreeDecomp greedy_degree(const vector<vector<int> > &graph) {
     }
     sort(cb.begin(), cb.end());
     bag[trial] = cb;
+    if (DEBUG) {
+      cout << "elim:" << elim[trial] <<" [";
+      for (int i = 0; i < (int) cb.size(); ++i) {
+	cout << cb[i] << " ";
+      }
+      cout << "]" << endl;
+    }
     for (int i = 0; i < (int)cb.size(); ++i) { // make N_G(mi) clique
       for (int j = 0; j < (int)cb.size(); ++j) {
 	if (i == j) {
@@ -208,7 +216,7 @@ TreeDecomp greedy_degree(const vector<vector<int> > &graph) {
   td.bags.resize(n);
   for (int i = n - 1; i >= 0; --i) { // handle with elim[i].
     int tv = n - 1 - i;
-    int par;
+    int par = -2;
     if (tv == 0) {
       par = -1;
     } else {
@@ -218,9 +226,21 @@ TreeDecomp greedy_degree(const vector<vector<int> > &graph) {
 	  break;
 	}
       }
+      if (par == -2) {
+	par = 0;
+      }
+    }
+    if (DEBUG) {
+      cout << "par:" << par <<" [";
+      for (int j = 0; j < (int) bag[i].size(); ++j) {
+	cout << bag[i][j] << " ";
+      }
+      cout << "]" << endl;
     }
     td.parent[tv] = par;
-    td.children[par].push_back(tv);
+    if (par >= 0) {
+      td.children[par].push_back(tv);
+    }
     td.bags[tv] = bag[i];
   }
   int w = 0;
