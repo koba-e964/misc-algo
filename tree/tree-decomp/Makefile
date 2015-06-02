@@ -13,6 +13,8 @@ decomp-max-indep: td.cpp td.h decomp.cpp decomp.h max-indep.cpp max-indep.h deco
 	$(CXX) $(CXXFLAGS) td.cpp decomp.cpp max-indep.cpp decomp-max-indep.cpp -o $@
 max-indep-exp : max-indep-exp.cpp
 	$(CXX) $(CXXFLAGS) max-indep-exp.cpp -o $@
+random-decomp: td.cpp td.h decomp.cpp decomp.h random-decomp.cpp
+	$(CXX) $(CXXFLAGS) td.cpp decomp.cpp random-decomp.cpp -o $@
 indep/%.test : max-indep-exp decomp-max-indep indep/%.txt
 	./max-indep-exp <indep/$*.txt
 	./decomp-max-indep <indep/$*.txt
