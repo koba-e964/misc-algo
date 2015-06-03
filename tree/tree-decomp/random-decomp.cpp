@@ -4,21 +4,22 @@
 #include <iostream>
 #include <cstdlib>
 
-const int N = 100;
+const int M = 1000;
 
-int g[N][N];
+int g[M][M];
 
 using namespace std;
 
 int main() {
-  int n;
-  cin >> n;
+  int n, N, E;
+  cin >> n >> N >> E;
   srand(time(0));
+  double avpw = 0, avtw = 0;
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < N; ++j) {
       for (int k = 0; k < N; ++k) {
 	g[j][k] = 0;
-	if (j != k && (rand() % 100) <= 19) { // probability 0.2
+	if (j != k && (rand() % (N * N - 1)) < 2 * E) { // probability 2E / N(N-1)
 	  g[j][k] = 1;
 	}
       }
@@ -33,8 +34,14 @@ int main() {
       }
       e += adj[i].size();
     }
+    int pw = path_decomp(adj).width();
+    int tw = greedy_degree(adj).width();
     cout << "|V| = " << N << ", |E| = " << e << endl;
-    cout << "tw(path-decomposition):" << path_decomp(adj).width() << endl;
-    cout << "tw(greedy-degree):" << greedy_degree(adj).width() << endl;
+    cout << "tw(path-decomposition):" << pw << endl;
+    cout << "tw(greedy-degree):" << tw << endl;
+    avpw += pw;
+    avtw += tw;
   }
+  cout << "averate tw(path) = " << avpw / n << endl;
+  cout << "averate tw(greedy) = " << avtw / n << endl;
 }

@@ -1,5 +1,5 @@
 CXXFLAGS = -Wall -Wextra -Wpedantic
-OBJS = td-main max-indep-main decomp-main decomp-max-indep max-indep-exp
+OBJS = td-main max-indep-main decomp-main decomp-max-indep max-indep-exp random-decomp
 
 .PHONY : clean
 
