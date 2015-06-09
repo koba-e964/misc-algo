@@ -8,7 +8,7 @@
 using namespace std;
 
 
-const int MAX_WIDTH = 8;
+const int MAX_WIDTH = 16;
 const int MEMO = 1 << (MAX_WIDTH + 1);
 const int minf = -123456789;
 const bool DEBUG = false;
@@ -116,7 +116,7 @@ void rec(const TreeDecomp &td, const Graph &g, int r, int dp[][MEMO]) {
 int max_indep(const TreeDecomp &td, const Graph &g) {
   int n = td.size();
   if (td.width() > MAX_WIDTH) {
-    assert(0);
+    assert(! "tree-width too large");
   }
   int (*dp)[MEMO] = new int[n][MEMO];
   rec(td, g, 0, dp);
