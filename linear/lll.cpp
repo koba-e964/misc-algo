@@ -10,12 +10,17 @@ using namespace Eigen;
  * From CiCANT
  */
 
-void red(int k, int l, MatrixXd &mu, vector<VectorXd> &basis, MatrixXd &h) {
-  if (mu(k, l) <= 0.5) {
+template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+void red(int k,
+	 int l,
+	 Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols> &mu,
+	 Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> &basis,
+	 Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols> &h) {
+  if (abs(mu(k, l)) <= 0.5) {
     return;
   }
-  double q = floor(mu(k, l) + 0.5);
-  basis[k] -= q * basis[l];
+  Scalar q = floor(mu(k, l) + 0.5);
+  basis.col(k) -= q * basis.col(l);
   mu(k, l) -= q;
   h.col(k) -= q * h.col(l);
   for (int i = 0; i < l; ++i) {
@@ -23,45 +28,54 @@ void red(int k, int l, MatrixXd &mu, vector<VectorXd> &basis, MatrixXd &h) {
   }
 }
 
-void swap(int k, vector<VectorXd> &basis, MatrixXd &mu, vector<double> &cb, int kmax, MatrixXd &h) {
-  swap(basis[k], basis[k - 1]);
+template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+void swap(int k, Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> &basis,
+	  Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols> &mu,
+	  vector<Scalar> &cb,
+	  int kmax,
+	  Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols> &h) {
   for (int i = 0; i < mu.cols(); ++i) {
+    swap(basis(i, k), basis(i, k - 1));
     swap(h(i, k), h(i, k - 1));
   }
   for (int j = 0; j < k - 1; ++j) {
     swap(mu(k, j), mu(k - 1, j));
   }
-  double m = mu(k, k - 1), b = cb[k] + m * m * cb[k - 1];
+  Scalar m = mu(k, k - 1), b = cb[k] + m * m * cb[k - 1];
   mu(k, k - 1) = m * cb[k - 1] / b;
   cb[k] *= cb[k - 1] / b;
   cb[k - 1] = b;
   for (int i = k + 1; i <= kmax; ++i) {
-    double t = mu(i, k);
+    Scalar t = mu(i, k);
     mu(i, k) = mu(i, k - 1) - m * t;
     mu(i, k - 1) = t + mu(k, k - 1) * mu(i, k);
   }
 }
 
 
-MatrixXd lll_reduce(vector<VectorXd> &basis) {
+template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
+Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols>
+lll_reduce(Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> &basis) {
   int k = 1, kmax = 0;
-  int n = basis.size();
-  vector<VectorXd> bc(n); // b*
-  bc[0] = basis[0];
-  vector<double> cb(n); // B
-  cb[0] = bc[0].squaredNorm();
-  MatrixXd mu(n, n);
-  MatrixXd h(MatrixXd::Identity(n, n));
+  int n = basis.cols();
+  int m = basis.rows(); // dim b[i]
+  Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> bc(m, n); // b*
+  bc.col(0) = basis.col(0);
+  vector<Scalar> cb(n); // B
+  cb[0] = bc.col(0).squaredNorm();
+  typedef Matrix<Scalar, Cols, Cols, Options, MaxCols, MaxCols> MS;
+  MS mu(n, n);
+  MS h(MatrixXd::Identity(n, n));
   // Step 2
   do {
     if (k > kmax) {
       kmax = k;
-      bc[k] = basis[k];
+      bc.col(k) = basis.col(k);
       for (int j = 0; j < k; ++j) {
-	mu(k, j) = basis[k].dot(bc[j]) / cb[j];
-	bc[k] -= mu(k, j) * bc[j];
+	mu(k, j) = basis.col(k).dot(bc.col(j)) / cb[j];
+	bc.col(k) -= mu(k, j) * bc.col(j);
       }
-      cb[k] = bc[k].squaredNorm();
+      cb[k] = bc.col(k).squaredNorm();
       if (cb[k] == 0) {
 	cerr << "basis did not form a basis" << endl;
 	abort();
@@ -86,17 +100,13 @@ MatrixXd lll_reduce(vector<VectorXd> &basis) {
 }
 
 int main(void) {
-  VectorXd b1(3), b2(3), b3(3);
-  b1 << 1, 1, 1;
-  b2 << -1, 0, 2;
-  b3 << 3, 5, 6;
-  vector<VectorXd> basis;
-  basis.push_back(b1);
-  basis.push_back(b2);
-  basis.push_back(b3);
+  MatrixXd basis(3, 3);
+  basis << 1, -1, 3,
+  1, 0, 5,
+  1, 2, 6;
   MatrixXd h = lll_reduce(basis);
   for (int i = 0; i < 3; ++i) {
-    cout << "basis[" << i << "]=" << basis[i] << endl;
+    cout << "basis[" << i << "]=" << basis.col(i) << endl;
   }
   cout << "H = " << h << endl;
 }
