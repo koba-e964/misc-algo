@@ -10,20 +10,24 @@ using namespace Eigen;
  * From CiCANT
  */
 
-void red(int k, int l, MatrixXd &mu, vector<VectorXd> &basis) {
+void red(int k, int l, MatrixXd &mu, vector<VectorXd> &basis, MatrixXd &h) {
   if (mu(k, l) <= 0.5) {
     return;
   }
   double q = floor(mu(k, l) + 0.5);
   basis[k] -= q * basis[l];
   mu(k, l) -= q;
+  h.col(k) -= q * h.col(l);
   for (int i = 0; i < l; ++i) {
     mu(k, i) -= q * mu(l, i);
   }
 }
 
-void swap(int k, vector<VectorXd> &basis, MatrixXd &mu, vector<double> &cb, int kmax) {
+void swap(int k, vector<VectorXd> &basis, MatrixXd &mu, vector<double> &cb, int kmax, MatrixXd &h) {
   swap(basis[k], basis[k - 1]);
+  for (int i = 0; i < mu.cols(); ++i) {
+    swap(h(i, k), h(i, k - 1));
+  }
   for (int j = 0; j < k - 1; ++j) {
     swap(mu(k, j), mu(k - 1, j));
   }
@@ -39,7 +43,7 @@ void swap(int k, vector<VectorXd> &basis, MatrixXd &mu, vector<double> &cb, int 
 }
 
 
-void lll_reduce(vector<VectorXd> &basis) {
+MatrixXd lll_reduce(vector<VectorXd> &basis) {
   int k = 1, kmax = 0;
   int n = basis.size();
   vector<VectorXd> bc(n); // b*
@@ -47,6 +51,7 @@ void lll_reduce(vector<VectorXd> &basis) {
   vector<double> cb(n); // B
   cb[0] = bc[0].squaredNorm();
   MatrixXd mu(n, n);
+  MatrixXd h(MatrixXd::Identity(n, n));
   // Step 2
   do {
     if (k > kmax) {
@@ -64,20 +69,20 @@ void lll_reduce(vector<VectorXd> &basis) {
     }
     //Step 3
     while (1) {
-      red(k, k - 1, mu, basis);
+      red(k, k - 1, mu, basis, h);
       if (cb[k] < (0.75 - pow(mu(k, k - 1), 2.0)) * cb[k - 1]) {
-	swap(k, basis, mu, cb, kmax);
+	swap(k, basis, mu, cb, kmax, h);
 	k = max(1, k - 1);
 	continue;
       }
       break;
     }
     for (int l = k - 2; l >= 0; --l) {
-      red(k, l, mu, basis);
+      red(k, l, mu, basis, h);
     }
     ++k;
   } while (k < n);
-  return;
+  return h;
 }
 
 int main(void) {
@@ -89,8 +94,9 @@ int main(void) {
   basis.push_back(b1);
   basis.push_back(b2);
   basis.push_back(b3);
-  lll_reduce(basis);
+  MatrixXd h = lll_reduce(basis);
   for (int i = 0; i < 3; ++i) {
     cout << "basis[" << i << "]=" << basis[i] << endl;
   }
+  cout << "H = " << h << endl;
 }
