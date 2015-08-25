@@ -29,8 +29,7 @@ string comment(void) {
   return "<unnamed>";
 }
 
-vector<vector<int> > read_stp_graph(void) {
-  int n;
+vector<vector<int> > read_stp_graph(int &n, int &m) {
   string s;
   cin >> s;
   stoupper(s);
@@ -39,7 +38,6 @@ vector<vector<int> > read_stp_graph(void) {
   cin >> s;
   stoupper(s);
   assert (s == "EDGES");
-  int m;
   cin >> m;
   vector<vector<int> > graph(n); // adjacent list representation
   for (int i = 0; i < m; i++) {
@@ -60,6 +58,7 @@ vector<vector<int> > read_stp_graph(void) {
 }
 
 int main(void) {
+  int n = 0, m = 0;
   string s;
   vector<vector<int> > graph;
   string name;
@@ -75,11 +74,10 @@ int main(void) {
       continue;
     }
     if (s == "GRAPH") {
-      graph = read_stp_graph();
+      graph = read_stp_graph(n, m);
       break;
     }
   }
-  int n = graph.size();
   TreeDecomp td = greedy_degree(graph);
   TreeDecomp nicetd = make_nice_decomp(td);
   Graph g;
@@ -100,8 +98,10 @@ int main(void) {
   for (int i = 0; i < n; ++i) {
     g.weight[i] = 1; // weight is 1
   }
-  cout << "graph name : " << name << endl;
+  cout << "graph name : " << name << ", |V| = " << n << ", |E| = " << m << endl;
   cout << "tree-width = " << nicetd.width() << endl;
   int mitd = max_indep(nicetd, g);
   cout << "max-indep(td) = " << mitd << endl;
+  cout << name.substr(1, name.length() - 2) << " & " << n << " & "
+       << m << " & " << nicetd.width() << " & " << mitd << "\\\\" << endl;
 }
