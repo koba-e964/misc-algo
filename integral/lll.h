@@ -1,3 +1,5 @@
+#ifndef LLL_H
+#define LLL_H
 #include <vector>
 #include <iostream>
 
@@ -303,3 +305,4 @@ template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxC
   p = n - r; // output p
   return h;
 }
+#endif // ifndef LLL_H
