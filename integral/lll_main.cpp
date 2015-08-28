@@ -19,8 +19,7 @@ void test_dependent(void) {
   cout << "H = " << h << endl;
 }
 
-
-int main(void) {
+void test_usual(void) {
   MatrixXd basis(3, 3);
   basis << 1, -1, 3,
     1, 0, 5,
@@ -36,5 +35,9 @@ int main(void) {
   cout << "H = " << h << endl;
   MatrixXi h2 = integral_lll_reduce(basis_int);
   cout << "H2 = " << h2 << endl;
+}
+
+int main(void) {
+  // test_usual();
   test_dependent();
 }

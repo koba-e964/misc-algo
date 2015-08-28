@@ -213,6 +213,7 @@ template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxC
       swap(mu(i, k), mu(i, k - 1));
     }
   } else if (cb[k] < eps && max(m, -m) > eps) {
+    cout << "B_k = 0, \\mu != 0" << endl;
     cb[k - 1] = b;
     mu(k, k - 1) = 1 / m;
     for (int i = k + 1; i <= kmax; ++i) {
@@ -261,6 +262,7 @@ template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxC
     }
     if (k > kmax) {
       kmax = k;
+      bc.col(0) = basis.col(0);
       bc.col(k) = basis.col(k);
       for (int j = 0; j < k; ++j) {
 	if (cb[j] >= eps) {
@@ -274,11 +276,13 @@ template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxC
       cb[k] = bc.col(k).squaredNorm();
     }
     //Step 3
+    bool swapped = 0;
     while (1) {
       red(k, k - 1, mu, basis, h);
       if (cb[k] < (0.75 - pow(mu(k, k - 1), 2.0)) * cb[k - 1]) {
 	dependent_swap(k, basis, mu, cb, kmax, h, eps);
 	k = max(1, k - 1);
+	swapped = 1; //TODO additional
 	continue;
       }
       break;
@@ -286,7 +290,11 @@ template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxC
     for (int l = k - 2; l >= 0; --l) {
       red(k, l, mu, basis, h);
     }
-    ++k;
+    if (swapped) {
+      kmax = k -1;
+    } else {
+      ++k;
+    }
   } while (k < n);
   int r = 0;
   for (int i = 0; i < n; i++) {
